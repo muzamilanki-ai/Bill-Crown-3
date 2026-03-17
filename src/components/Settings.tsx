@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
 import { ArrowLeft, Palette, Globe, Shield, Heart, Mail } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface SettingsProps {
   onBack: () => void;
@@ -8,6 +9,7 @@ interface SettingsProps {
 
 export default function Settings({ onBack }: SettingsProps) {
   const { themeColor, setThemeColor, language, setLanguage, plan, customWatermark, setCustomWatermark } = useAppStore();
+  const { t } = useTranslation();
 
   const colors = [
     '#3b82f6', // blue
@@ -24,14 +26,14 @@ export default function Settings({ onBack }: SettingsProps) {
         <button onClick={onBack} className="p-2 rounded-full hover:bg-white/10 transition-colors">
           <ArrowLeft size={24} />
         </button>
-        <h2 className="font-bold text-lg">Settings</h2>
+        <h2 className="font-bold text-lg">{t('settings')}</h2>
         <div className="w-10" />
       </header>
 
       <main className="flex-1 p-6 space-y-6">
         <div className="glass-panel p-6 rounded-3xl border border-white/10">
           <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-            <Palette size={20} style={{ color: themeColor }} /> Theme Color
+            <Palette size={20} style={{ color: themeColor }} /> {t('themeColor')}
           </h3>
           <div className="flex gap-3 flex-wrap">
             {colors.map(color => (
@@ -47,20 +49,20 @@ export default function Settings({ onBack }: SettingsProps) {
 
         <div className="glass-panel p-6 rounded-3xl border border-white/10">
           <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-            <Globe size={20} style={{ color: themeColor }} /> Language
+            <Globe size={20} style={{ color: themeColor }} /> {t('language')}
           </h3>
           <div className="flex gap-3">
             <button
               onClick={() => setLanguage('en')}
               className={`flex-1 py-3 rounded-xl font-bold transition-colors ${language === 'en' ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
             >
-              English
+              {t('english')}
             </button>
             <button
               onClick={() => setLanguage('ur')}
               className={`flex-1 py-3 rounded-xl font-bold font-urdu transition-colors ${language === 'ur' ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
             >
-              اردو
+              {t('urdu')}
             </button>
           </div>
         </div>
@@ -68,19 +70,19 @@ export default function Settings({ onBack }: SettingsProps) {
         {plan === 'premium' && (
           <div className="glass-panel p-6 rounded-3xl border border-white/10">
             <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <Shield size={20} style={{ color: themeColor }} /> Custom Watermark
+              <Shield size={20} style={{ color: themeColor }} /> {t('watermark')}
             </h3>
             <div className="space-y-3">
               <input 
                 type="text" 
-                placeholder="Name" 
+                placeholder={t('watermarkName')} 
                 value={customWatermark.name}
                 onChange={e => setCustomWatermark({ ...customWatermark, name: e.target.value })}
                 className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[var(--theme-color)] transition-colors"
               />
               <input 
                 type="text" 
-                placeholder="Phone" 
+                placeholder={t('watermarkPhone')} 
                 value={customWatermark.phone}
                 onChange={e => setCustomWatermark({ ...customWatermark, phone: e.target.value })}
                 className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[var(--theme-color)] transition-colors"

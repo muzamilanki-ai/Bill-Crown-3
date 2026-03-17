@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
 import { ArrowLeft, Check, Crown, Zap, Key } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface UpgradeProps {
   onBack: () => void;
@@ -9,6 +10,7 @@ interface UpgradeProps {
 
 export default function Upgrade({ onBack }: UpgradeProps) {
   const { plan, setPlan, setActivationKey, themeColor } = useAppStore();
+  const { t } = useTranslation();
   const [keyInput, setKeyInput] = useState('');
   const [error, setError] = useState('');
 
@@ -43,8 +45,8 @@ export default function Upgrade({ onBack }: UpgradeProps) {
           <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center glow-box bg-black/50 mb-4">
             <Crown size={32} style={{ color: themeColor }} />
           </div>
-          <h2 className="text-2xl font-bold">Current Plan: <span className="uppercase" style={{ color: themeColor }}>{plan === 'free' ? 'UNPRO' : plan}</span></h2>
-          <p className="text-white/50 text-sm mt-2">Upgrade to unlock premium features and remove watermarks.</p>
+          <h2 className="text-2xl font-bold">{t('currentPlan')}: <span className="uppercase" style={{ color: themeColor }}>{plan === 'free' ? t('free') : plan}</span></h2>
+          <p className="text-white/50 text-sm mt-2">{t('unlockBudget')}</p>
         </div>
 
         <div className="grid gap-4">
@@ -72,22 +74,33 @@ export default function Upgrade({ onBack }: UpgradeProps) {
 
         <div className="glass-panel p-6 rounded-3xl mt-8">
           <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-            <Zap size={20} className="text-yellow-400" /> Payment Instructions
+            <Zap size={20} className="text-yellow-400" /> {t('paymentMethod')}
           </h3>
-          <div className="bg-white rounded-xl p-4 mb-4 flex justify-center">
-            {/* Placeholder for QR Code */}
-            <div className="w-48 h-48 bg-gray-200 flex items-center justify-center text-black font-bold border-4 border-green-500 rounded-xl relative overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                <Crown size={100} />
-              </div>
-              <span className="relative z-10 text-center">
-                EasyPaisa QR<br/>
-                <span className="text-sm font-normal">03349825814</span>
+          <div className="bg-white rounded-xl p-4 mb-4 flex flex-col items-center justify-center gap-4">
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Easypaisa_logo.svg/1200px-Easypaisa_logo.svg.png" 
+              alt="Easypaisa Logo" 
+              className="h-12 object-contain"
+              referrerPolicy="no-referrer"
+            />
+            <div className="w-64 h-auto bg-white flex flex-col items-center justify-center text-black font-bold border-4 border-green-500 rounded-xl relative overflow-hidden p-2">
+              <img 
+                src="/easypaisa-qr.jpg" 
+                alt="Easypaisa QR Code" 
+                className="w-full h-auto object-contain rounded-lg"
+                onError={(e) => {
+                  // Fallback if image is not uploaded yet
+                  (e.target as HTMLImageElement).src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=03349825814`;
+                }}
+              />
+              <span className="mt-2 text-center text-sm">
+                MUHAMMAD ANWAR<br/>
+                <span className="text-xs font-normal text-gray-600">MSISDN: *******5814</span>
               </span>
             </div>
           </div>
           <div className="text-sm text-white/70 space-y-2 mb-6">
-            <p>1. Pay via EasyPaisa to <strong>03349825814</strong></p>
+            <p>1. {t('payWithEasypaisa')} to <strong>03349825814</strong></p>
             <p>2. Send SMS: <strong>"Bill 3"</strong> to 03349825814</p>
             <p>3. Admin will reply with your activation key.</p>
           </div>

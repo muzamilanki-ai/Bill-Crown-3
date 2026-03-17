@@ -16,6 +16,10 @@ body {
   overflow-x: hidden;
 }
 
+html.font-urdu * {
+  font-family: var(--font-urdu) !important;
+}
+
 .glass-panel {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(16px);

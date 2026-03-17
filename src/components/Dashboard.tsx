@@ -1,8 +1,9 @@
 import { motion } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
 import { Page } from '../App';
-import { Crown, Settings, FileText, History, Gamepad2, Plus, Zap } from 'lucide-react';
+import { Crown, Settings, FileText, History, Gamepad2, Plus, Zap, Calculator } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface DashboardProps {
   onNavigate: (page: Page) => void;
@@ -10,11 +11,13 @@ interface DashboardProps {
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
   const { plan, themeColor } = useAppStore();
+  const { t } = useTranslation();
 
   const menuItems = [
-    { id: 'create', title: 'Create Bill', icon: Plus, color: themeColor, desc: 'Generate new invoice' },
-    { id: 'history', title: 'Bill History', icon: History, color: '#a855f7', desc: 'View saved bills' },
-    { id: 'game', title: 'Mini Game', icon: Gamepad2, color: '#ec4899', desc: 'Play & earn points', locked: plan === 'free' },
+    { id: 'create', title: t('createBill'), icon: Plus, color: themeColor, desc: 'Generate new invoice' },
+    { id: 'history', title: t('billHistory'), icon: History, color: '#a855f7', desc: 'View saved bills' },
+    { id: 'budget', title: t('budgetCalculator'), icon: Calculator, color: '#10b981', desc: 'Calculate monthly budget', locked: plan === 'free' },
+    { id: 'game', title: t('moneyGame'), icon: Gamepad2, color: '#ec4899', desc: 'Play & earn points', locked: plan === 'free' },
   ];
 
   return (
@@ -29,7 +32,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <h1 className="font-bold text-lg leading-tight">Bill Crown 3</h1>
             <p className="text-xs text-white/50 capitalize font-medium flex items-center gap-1">
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: themeColor }} />
-              {plan === 'free' ? 'Unpro' : plan} Plan
+              {plan === 'free' ? t('free') : plan} Plan
             </p>
           </div>
         </div>

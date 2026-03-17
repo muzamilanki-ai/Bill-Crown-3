@@ -8,9 +8,10 @@ import Game from './components/Game';
 import Upgrade from './components/Upgrade';
 import Settings from './components/Settings';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import BudgetCalculator from './components/BudgetCalculator';
 import { motion, AnimatePresence } from 'motion/react';
 
-export type Page = 'splash' | 'dashboard' | 'create' | 'history' | 'game' | 'upgrade' | 'settings' | 'privacy';
+export type Page = 'splash' | 'dashboard' | 'create' | 'history' | 'game' | 'upgrade' | 'settings' | 'privacy' | 'budget';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('splash');
@@ -46,6 +47,7 @@ export default function App() {
       case 'game': return <Game onBack={() => setCurrentPage('dashboard')} onUpgrade={() => setCurrentPage('upgrade')} />;
       case 'upgrade': return <Upgrade onBack={() => setCurrentPage('dashboard')} />;
       case 'settings': return <Settings onBack={() => setCurrentPage('dashboard')} />;
+      case 'budget': return <BudgetCalculator onBack={() => setCurrentPage('dashboard')} onUpgrade={() => setCurrentPage('upgrade')} />;
       case 'privacy': return <PrivacyPolicy onBack={() => setCurrentPage('settings')} />;
       default: return <Dashboard onNavigate={setCurrentPage} />;
     }
