@@ -29,7 +29,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <h1 className="font-bold text-lg leading-tight">Bill Crown 3</h1>
             <p className="text-xs text-white/50 capitalize font-medium flex items-center gap-1">
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: themeColor }} />
-              {plan} Plan
+              {plan === 'free' ? 'Unpro' : plan} Plan
             </p>
           </div>
         </div>

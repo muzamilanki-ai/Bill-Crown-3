@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
 import { Product, Bill } from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import { ArrowLeft, Plus, Trash2, Download, Check, FileText } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Download, Check, FileText, Share2 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -74,22 +74,57 @@ export default function CreateBill({ onBack }: CreateBillProps) {
 
   const downloadPDF = async () => {
     if (!billRef.current) return;
-    const canvas = await html2canvas(billRef.current, { scale: 2 });
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`Bill_${customerName}_${new Date().getTime()}.pdf`);
+    try {
+      const canvas = await html2canvas(billRef.current, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Bill_${customerName}_${new Date().getTime()}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
   };
 
   const downloadImage = async (format: 'png' | 'jpeg') => {
     if (!billRef.current) return;
-    const canvas = await html2canvas(billRef.current, { scale: 2 });
-    const link = document.createElement('a');
-    link.download = `Bill_${customerName}_${new Date().getTime()}.${format}`;
-    link.href = canvas.toDataURL(`image/${format}`);
-    link.click();
+    try {
+      const canvas = await html2canvas(billRef.current, { scale: 2, useCORS: true });
+      const link = document.createElement('a');
+      link.download = `Bill_${customerName}_${new Date().getTime()}.${format}`;
+      link.href = canvas.toDataURL(`image/${format}`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error generating image:', error);
+      alert('Failed to generate image. Please try again.');
+    }
+  };
+
+  const shareBill = async () => {
+    if (!billRef.current) return;
+    try {
+      const canvas = await html2canvas(billRef.current, { scale: 2, useCORS: true });
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], `Bill_${customerName}_${new Date().getTime()}.png`, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'Invoice',
+            text: `Here is the invoice for ${customerName}`,
+            files: [file]
+          });
+        } else {
+          alert('Sharing is not supported on this device/browser.');
+        }
+      }, 'image/png');
+    } catch (error) {
+      console.error('Error sharing:', error);
+      alert('Failed to share bill. Please try again.');
+    }
   };
 
   if (showPreview && currentBill) {
@@ -186,7 +221,7 @@ export default function CreateBill({ onBack }: CreateBillProps) {
           </div>
 
           {/* Download Actions */}
-          <div className="mt-6 grid grid-cols-3 gap-3">
+          <div className="mt-6 grid grid-cols-4 gap-3">
             <button onClick={downloadPDF} className="flex flex-col items-center justify-center p-4 rounded-2xl glass-panel hover:bg-white/10 transition-colors">
               <FileText size={24} className="mb-2" style={{ color: themeColor }} />
               <span className="text-xs font-semibold">PDF</span>
@@ -198,6 +233,10 @@ export default function CreateBill({ onBack }: CreateBillProps) {
             <button onClick={() => downloadImage('png')} className="flex flex-col items-center justify-center p-4 rounded-2xl glass-panel hover:bg-white/10 transition-colors">
               <Download size={24} className="mb-2" style={{ color: themeColor }} />
               <span className="text-xs font-semibold">PNG</span>
+            </button>
+            <button onClick={shareBill} className="flex flex-col items-center justify-center p-4 rounded-2xl glass-panel hover:bg-white/10 transition-colors">
+              <Share2 size={24} className="mb-2" style={{ color: themeColor }} />
+              <span className="text-xs font-semibold">Share</span>
             </button>
           </div>
         </main>

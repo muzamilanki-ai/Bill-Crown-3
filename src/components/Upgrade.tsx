@@ -43,7 +43,7 @@ export default function Upgrade({ onBack }: UpgradeProps) {
           <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center glow-box bg-black/50 mb-4">
             <Crown size={32} style={{ color: themeColor }} />
           </div>
-          <h2 className="text-2xl font-bold">Current Plan: <span className="uppercase" style={{ color: themeColor }}>{plan}</span></h2>
+          <h2 className="text-2xl font-bold">Current Plan: <span className="uppercase" style={{ color: themeColor }}>{plan === 'free' ? 'UNPRO' : plan}</span></h2>
           <p className="text-white/50 text-sm mt-2">Upgrade to unlock premium features and remove watermarks.</p>
         </div>
 

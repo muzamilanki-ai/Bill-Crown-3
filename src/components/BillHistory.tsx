@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { useAppStore } from '../store/useAppStore';
-import { ArrowLeft, Trash2, Eye, Download, FileText, Edit2 } from 'lucide-react';
+import { ArrowLeft, Trash2, Eye, Download, FileText, Edit2, Share2 } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { Bill } from '../types';
 import html2canvas from 'html2canvas';
@@ -18,22 +18,57 @@ export default function BillHistory({ onBack, onEdit }: BillHistoryProps) {
 
   const downloadPDF = async () => {
     if (!billRef.current || !viewingBill) return;
-    const canvas = await html2canvas(billRef.current, { scale: 2 });
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`Bill_${viewingBill.customerName}_${new Date(viewingBill.date).getTime()}.pdf`);
+    try {
+      const canvas = await html2canvas(billRef.current, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Bill_${viewingBill.customerName}_${new Date(viewingBill.date).getTime()}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
   };
 
   const downloadImage = async (format: 'png' | 'jpeg') => {
     if (!billRef.current || !viewingBill) return;
-    const canvas = await html2canvas(billRef.current, { scale: 2 });
-    const link = document.createElement('a');
-    link.download = `Bill_${viewingBill.customerName}_${new Date(viewingBill.date).getTime()}.${format}`;
-    link.href = canvas.toDataURL(`image/${format}`);
-    link.click();
+    try {
+      const canvas = await html2canvas(billRef.current, { scale: 2, useCORS: true });
+      const link = document.createElement('a');
+      link.download = `Bill_${viewingBill.customerName}_${new Date(viewingBill.date).getTime()}.${format}`;
+      link.href = canvas.toDataURL(`image/${format}`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error generating image:', error);
+      alert('Failed to generate image. Please try again.');
+    }
+  };
+
+  const shareBill = async () => {
+    if (!billRef.current || !viewingBill) return;
+    try {
+      const canvas = await html2canvas(billRef.current, { scale: 2, useCORS: true });
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], `Bill_${viewingBill.customerName}_${new Date(viewingBill.date).getTime()}.png`, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'Invoice',
+            text: `Here is the invoice for ${viewingBill.customerName}`,
+            files: [file]
+          });
+        } else {
+          alert('Sharing is not supported on this device/browser.');
+        }
+      }, 'image/png');
+    } catch (error) {
+      console.error('Error sharing:', error);
+      alert('Failed to share bill. Please try again.');
+    }
   };
 
   if (viewingBill) {
@@ -127,7 +162,7 @@ export default function BillHistory({ onBack, onEdit }: BillHistoryProps) {
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-3 gap-3">
+          <div className="mt-6 grid grid-cols-4 gap-3">
             <button onClick={downloadPDF} className="flex flex-col items-center justify-center p-4 rounded-2xl glass-panel hover:bg-white/10 transition-colors">
               <FileText size={24} className="mb-2" style={{ color: themeColor }} />
               <span className="text-xs font-semibold">PDF</span>
@@ -139,6 +174,10 @@ export default function BillHistory({ onBack, onEdit }: BillHistoryProps) {
             <button onClick={() => downloadImage('png')} className="flex flex-col items-center justify-center p-4 rounded-2xl glass-panel hover:bg-white/10 transition-colors">
               <Download size={24} className="mb-2" style={{ color: themeColor }} />
               <span className="text-xs font-semibold">PNG</span>
+            </button>
+            <button onClick={shareBill} className="flex flex-col items-center justify-center p-4 rounded-2xl glass-panel hover:bg-white/10 transition-colors">
+              <Share2 size={24} className="mb-2" style={{ color: themeColor }} />
+              <span className="text-xs font-semibold">Share</span>
             </button>
           </div>
         </main>
