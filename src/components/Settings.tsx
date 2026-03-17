@@ -124,6 +124,19 @@ export default function Settings({ onBack }: SettingsProps) {
               <p className="text-xs text-white/50">Support the developer</p>
             </div>
           </button>
+
+          <button 
+            onClick={() => window.open('https://sites.google.com/view/muzamilproduction', '_blank')}
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-left"
+          >
+            <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+              <Shield size={20} className="text-blue-400" />
+            </div>
+            <div>
+              <h4 className="font-bold">Developer Policy</h4>
+              <p className="text-xs text-white/50">See developer policy</p>
+            </div>
+          </button>
         </div>
       </main>
     </div>
